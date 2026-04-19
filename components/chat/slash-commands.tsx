@@ -1,13 +1,10 @@
 "use client";
 
 import {
-  BombIcon,
   ListIcon,
   PaletteIcon,
-  PenLineIcon,
   PenSquareIcon,
   Trash2Icon,
-  XIcon,
 } from "lucide-react";
 import { type ReactNode, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
@@ -34,12 +31,6 @@ export const slashCommands: SlashCommand[] = [
     action: "clear",
   },
   {
-    name: "rename",
-    description: "Rename current chat",
-    icon: <PenLineIcon className="size-3.5" />,
-    action: "rename",
-  },
-  {
     name: "model",
     description: "Change the AI model",
     icon: <ListIcon className="size-3.5" />,
@@ -50,18 +41,6 @@ export const slashCommands: SlashCommand[] = [
     description: "Toggle dark/light mode",
     icon: <PaletteIcon className="size-3.5" />,
     action: "theme",
-  },
-  {
-    name: "delete",
-    description: "Delete current chat",
-    icon: <XIcon className="size-3.5" />,
-    action: "delete",
-  },
-  {
-    name: "purge",
-    description: "Delete all chats",
-    icon: <BombIcon className="size-3.5" />,
-    action: "purge",
   },
 ];
 

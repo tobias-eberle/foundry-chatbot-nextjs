@@ -1,71 +1,70 @@
-<a href="https://chatbot.ai-sdk.dev/demo">
-  <img alt="Chatbot" src="app/(chat)/opengraph-image.png">
-  <h1 align="center">Chatbot</h1>
-</a>
+# Lean Enterprise Chatbot
 
-<p align="center">
-    Chatbot (formerly AI Chatbot) is a free, open-source template built with Next.js and the AI SDK that helps you quickly build powerful chatbot applications.
-</p>
+A minimal, deployment-agnostic chatbot built with Next.js and the AI SDK. Points at any OpenAI-compatible Responses API endpoint — including Azure AI Foundry agents, Azure OpenAI, OpenAI, or a local proxy.
 
-<p align="center">
-  <a href="https://chatbot.ai-sdk.dev/docs"><strong>Read Docs</strong></a> ·
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#model-providers"><strong>Model Providers</strong></a> ·
-  <a href="#deploy-your-own"><strong>Deploy Your Own</strong></a> ·
-  <a href="#running-locally"><strong>Running locally</strong></a>
-</p>
-<br/>
+The template is intentionally stateless and auth-free: no database, no user accounts, no file uploads. Reloading the page starts a fresh chat session. Hooks for chat history and file attachments remain in the UI as "Coming soon" placeholders so they can be re-enabled without restructuring the app.
 
-## Features
+## What's included
 
-- [Next.js](https://nextjs.org) App Router
-  - Advanced routing for seamless navigation and performance
-  - React Server Components (RSCs) and Server Actions for server-side rendering and increased performance
-- [AI SDK](https://ai-sdk.dev/docs/introduction)
-  - Unified API for generating text, structured objects, and tool calls with LLMs
-  - Hooks for building dynamic chat and generative user interfaces
-  - Supports OpenAI, Anthropic, Google, xAI, and other model providers via AI Gateway
-- [shadcn/ui](https://ui.shadcn.com)
-  - Styling with [Tailwind CSS](https://tailwindcss.com)
-  - Component primitives from [Radix UI](https://radix-ui.com) for accessibility and flexibility
-- Data Persistence
-  - [Neon Serverless Postgres](https://vercel.com/marketplace/neon) for saving chat history and user data
-  - [Vercel Blob](https://vercel.com/storage/blob) for efficient file storage
-- [Auth.js](https://authjs.dev)
-  - Simple and secure authentication
+- **Next.js 16** App Router, React 19, TypeScript, Tailwind CSS
+- **AI SDK v6** (`ai`, `@ai-sdk/react`, `@ai-sdk/openai`) — streaming via `streamText` + `createUIMessageStream`
+- **shadcn/ui** components on top of Radix primitives
+- A single chat route (`app/(chat)/api/chat/route.ts`) that forwards messages to the configured LLM endpoint
+- One built-in tool: `getWeather`
 
-## Model Providers
+## What's intentionally out
 
-This template uses the [Vercel AI Gateway](https://vercel.com/docs/ai-gateway) to access multiple AI models through a unified interface. Models are configured in `lib/ai/models.ts` with per-model provider routing. Included models: Mistral, Moonshot, DeepSeek, OpenAI, and xAI.
+- No authentication, middleware, or user sessions — the app is public
+- No database, chat history, or message persistence
+- No file uploads or blob storage
+- No Vercel-specific configuration (`vercel.json`, AI Gateway, `@vercel/*` packages)
+- No artifacts / document editor / suggestion features
 
-### AI Gateway Authentication
+## Configuration
 
-**For Vercel deployments**: Authentication is handled automatically via OIDC tokens.
+Copy `.env.example` to `.env.local` and fill in the values:
 
-**For non-Vercel deployments**: You need to provide an AI Gateway API key by setting the `AI_GATEWAY_API_KEY` environment variable in your `.env.local` file.
+| Variable | Purpose |
+| --- | --- |
+| `LLM_ENDPOINT` | Base URL of the OpenAI-compatible Responses API |
+| `LLM_API_KEY` | Credential sent with each request |
+| `LLM_AUTH_HEADER` | `api-key` for Azure Foundry / Azure OpenAI; leave blank for OpenAI (`Authorization: Bearer`) |
+| `LLM_API_VERSION` | Optional query parameter (e.g. `2025-11-15-preview` for Azure Foundry) |
+| `NEXT_PUBLIC_LLM_MODEL_ID` | Model identifier sent in the request body. For Foundry agents, this is the agent's **underlying** model (e.g. `gpt-4.1-mini`) — the agent itself is selected via the URL path. |
+| `NEXT_PUBLIC_LLM_MODEL_NAME` | Display name in the model selector (defaults to `Assistant`) |
+| `LLM_TITLE_MODEL_ID` | Optional override for the title-generation model |
 
-With the [AI SDK](https://ai-sdk.dev/docs/introduction), you can also switch to direct LLM providers like [OpenAI](https://openai.com), [Anthropic](https://anthropic.com), [Cohere](https://cohere.com/), and [many more](https://ai-sdk.dev/providers/ai-sdk-providers) with just a few lines of code.
+### Azure AI Foundry example
 
-## Deploy Your Own
+```
+LLM_ENDPOINT=https://<resource>.services.ai.azure.com/api/projects/<project>/applications/<agent>/protocols/openai
+LLM_API_KEY=<key>
+LLM_AUTH_HEADER=api-key
+LLM_API_VERSION=2025-11-15-preview
+# Agent's underlying model — NOT the agent name (agent is in the URL path above)
+NEXT_PUBLIC_LLM_MODEL_ID=gpt-4.1-mini
+NEXT_PUBLIC_LLM_MODEL_NAME=Grumpy Agent
+```
 
-You can deploy your own version of Chatbot to Vercel with one click:
+### OpenAI example
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/templates/next.js/chatbot)
+```
+LLM_ENDPOINT=https://api.openai.com/v1
+LLM_API_KEY=sk-...
+LLM_AUTH_HEADER=
+NEXT_PUBLIC_LLM_MODEL_ID=gpt-4o-mini
+NEXT_PUBLIC_LLM_MODEL_NAME=GPT-4o mini
+```
 
 ## Running locally
 
-You will need to use the environment variables [defined in `.env.example`](.env.example) to run Chatbot. It's recommended you use [Vercel Environment Variables](https://vercel.com/docs/projects/environment-variables) for this, but a `.env` file is all that is necessary.
-
-> Note: You should not commit your `.env` file or it will expose secrets that will allow others to control access to your various AI and authentication provider accounts.
-
-1. Install Vercel CLI: `npm i -g vercel`
-2. Link local instance with Vercel and GitHub accounts (creates `.vercel` directory): `vercel link`
-3. Download your environment variables: `vercel env pull`
-
 ```bash
 pnpm install
-pnpm db:migrate # Setup database or apply latest database changes
 pnpm dev
 ```
 
-Your app template should now be running on [localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000).
+
+## Deployment
+
+The app has no vendor-specific runtime requirements — any platform that runs Next.js (Vercel, Azure Container Apps, AWS, a Docker host) will work. Set the environment variables above in your target environment.
