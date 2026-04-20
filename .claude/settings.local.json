@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(pnpm install *)",
-      "Bash(pnpm build *)"
+      "Bash(pnpm build *)",
+      "Bash(npm view *)",
+      "Bash(npm run *)"
     ]
   }
 }
